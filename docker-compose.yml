@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  # mysql
+  mysql:
+    image: mysql:5.7
+    container_name: db-server
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Mko0Zaq1
+      MYSQL_DATABASE: dbcode
+      MYSQL_USER: codeuser
+      MYSQL_PASSWORD: 0okm1qaz
+  
+  # mysqld-exporter
+  exporter:
+    image: prom/mysqld-exporter
+    container_name: exp-server
+    ports:
+      - "9104:9104"
+    environment: 
+      DATA_SOURCE_NAME: "codeuser:0okm1qaz@(db-server:3306)/dbcode"
+  
+  # prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: prom-server
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./config/prometheus.yml:/etc/prometheus/prometheus.yml"
+
+  # grafana
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    ports:
+      - '3000:3000'
+    depends_on:
+      - prom-server
